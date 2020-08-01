@@ -1,0 +1,13 @@
+[Unit]
+Description=AUMC Tally Lights
+After=network.service
+
+[Service]
+Type=forking
+ExecStart=/etc/init.d/tallylights start
+ExecStop=/etc/init.d/tallylights stop
+TimeoutStartSec=600
+TimeoutStopSec=600
+
+[Install]
+WantedBy=multi-user.target

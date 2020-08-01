@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cameras>
+	<camera>
+		<cameraName>C1P1 NDI</cameraName>
+		<sceneName>camera 1 Platform 1</sceneName>
+		<cameraAddr>4</cameraAddr>
+	</camera>
+	<camera>
+		<cameraName>C2C1 HDMI</cameraName>
+		<sceneName>camera 2 Choir</sceneName>
+		<cameraAddr>5</cameraAddr>
+	</camera>
+	<camera>
+		<cameraName>C3P2 NDI</cameraName>
+		<sceneName>camera 3 Platform 2</sceneName>
+		<cameraAddr>6</cameraAddr>
+	</camera>
+	<camera>
+		<cameraName>dummy</cameraName>
+		<sceneName>Tally Test</sceneName>
+		<cameraAddr>3</cameraAddr>
+	</camera>
+</cameras>
+	
