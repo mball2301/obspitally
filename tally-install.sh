@@ -55,7 +55,7 @@ fi
 test_wiringpi()
 {
 piver=`gpio -v | grep version | awk '{print $3}'`
-if [ ${piver:-X} = "X"
+if [ ${piver:-X} = "X" ]
 then
     echo "wiringpi version is not installed, please install wiring pi with sudo apt-get install wiringpi"
     exit 9
@@ -86,6 +86,10 @@ case $jvers in
        ;;
 esac      
 
+cp -p install/tallylights $INSTDIR/tallylights
+cp -p install/tallylights.sh $INSTDIR/tallylights.sh
+cp -p install/tallylights.service $INSTDIR/tallylights.service
+
 cd $INSTDIR
 echo "installing tally pi application"
 tar -xv /tmp/tallypi.tar   
@@ -93,9 +97,9 @@ tar -xv /tmp/tallypi.tar
 echo "installing tally pi shell script"
 echo "enter your obs websocket server ip address:"
 read obswebip
-if ${obswebip:-X} = "X" ]
+if [ ${obswebip:-X} = "X" ]
 then
-    obswebip=192.168.0.0
+    obswebip="192.168.0.0"
 fi
 
 echo "enter your obs Websocket server password"
@@ -104,9 +108,10 @@ if [ ${obswebpwd:-X} = "X" ]
 then
     obswebpwd="NULL"
 fi 
-sed -e tallylights.sh "s/{server_ip}/$obswebip/"
-sed -e tallylights.sh "s/{server_password}/$obswebpwd/"
-sed -e tallylights.sh "s/{INSTDIR}/$INSTDIR/"
+set -x
+sed -i "s/server_ip/"$obswebip"/" tallylights.sh
+sed -i "s/server_password/"$obswebpwd"/" tallylights.sh
+sed -i "s/INSTDIR/"$INSTDIR"/" tallylights.sh
 
 }
 
@@ -149,7 +154,7 @@ setup_tally_service()
 cd $INSTDIR
 
 echo "setting up starup services"
-sudo sed tallylights "s/{INSTDIR}/$INSTDIR}/" > /etc/init.d/tallylights
+sudo sed "s/{INSTDIR}/$INSTDIR}/" tallylights > /etc/init.d/tallylights 
 
 sudo mv tallylights.service /usr/lib/systemd/shared/
 
