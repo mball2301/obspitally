@@ -1,4 +1,5 @@
 #!/bin/bash
+#obs pi tally install script
 
 osrelease=`grep PRETTY_NAME /etc/os-release|awk -F= '{print $2}'| awk '{print $1}'`
 osversion=`grep VERSION /etc/os-release|awk -F= '{print $2}'|tail -2 | head -n1`
