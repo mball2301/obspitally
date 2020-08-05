@@ -1,30 +1,22 @@
 #!/bin/bash
+set -x
 
-osrelease=(grep PRETTY_NAME /etc/os-release|awk -F= '{print $2})
-osversion=(grep VERSION /etc/os-release|awk -F= '{print $2} )
+osrelease=`grep PRETTY_NAME /etc/os-release|awk -F= '{print $2}'| awk '{print $1}'`
+osversion=`grep VERSION /etc/os-release|awk -F= '{print $2}'|tail -2 | head -n1`
 if [ ${osrelease:-NA} = "NA" ]
 then
     echo "OS not recognized aborting"
     exit 1
- fi
- echo "found OS-$osrelease VERSION-$osversion"
- osshort=(echo $osversion | cut -b1-4)
-      
- if [ $osshort = "Rasp"
- then
-     raspos=yes
- else
-     echo "installing on a none Raspian OS. Use at your own discression"
- fi
-
-
-test_Pi4J()
-{
-echo "pi4j"
-# test to see if pi4j and wiring pi are installed if not ask if you can install
-
-}
-
+fi
+echo "found OS-$osrelease VERSION-$osversion"
+osshort=`echo $osrelease| cut -b2-5`
+     
+if [ $osshort = "Rasp" ]
+then
+    raspos=yes
+else
+    echo "installing on a none Raspian OS. Use at your own discression"
+fi
 
 set_tallypi_location()
 {
@@ -74,17 +66,20 @@ fi
 install_pi4j()
 {
 
-curl -sSL https://pi4j.com/install | sudo bash
+curl -SSL https://pi4j.com/install | sudo bash
 }
 
-jvers=(java -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1)
+install_talllypi()
+{
+jvers=`java -version 2>&1 | head -1 | cut -d\" -f2 | sed '/^1\./s///' | cut -d'.' -f1`
+echo $jvers
 
-case in $jvers
+case $jvers in
     8)
-       curl -output /tmp/tallypi.tar https://github.com/mball2301/obspitally/java8/obstally8.tar
+       curl --output /tmp/tallypi.tar https://github.com/mball2301/obspitally/java8/obstally8.tar
        ;;
     11)
-       curl -output /tmp/tallypi.tar https://github.com/mball2301/obspitally/java8/obstally11.tar
+       curl --output /tmp/tallypi.tar https://github.com/mball2301/obspitally/java8/obstally11.tar
        ;;
     *)
        echo "unsupported version of JAVA.  Needs to be JAVA 8 or 11."
@@ -92,9 +87,6 @@ case in $jvers
        ;;
 esac      
 
-install_talllypi()
-{
-       
 cd $INSTDIR
 echo "installing tally pi application"
 tar -xv /tmp/tallypi.tar   
@@ -129,7 +121,7 @@ do
     echo "enter the source name from OBS"
     read obssource
 
-    echo "enter the GPIO pin to relate to this source
+    echo "enter the GPIO pin to relate to this source"
     raspgpio
 
     echo "to ente another relationship enter 'y'"
@@ -157,7 +149,7 @@ systemctl reload
 }
 
 cleanup()
-}
+{
 rm -f $INSTDIR/tallylights
 rm -f /tmp/tallypi.tar
 
@@ -165,8 +157,6 @@ rm -f /tmp/tallypi.tar
 
 #main
 echo "Please make sure you have a JAVA JRE installed to run talllypi"
-
-
 
 set_tallypi_location
 
