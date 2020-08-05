@@ -28,37 +28,54 @@ echo "pi4j"
 
 set_tallypi_location()
 {
- echo "install in /home/pi/tallypi? (y/n)"
- read response
- if [ $response = "y" ]
- then
-     export INSTDIR="/home/pi/tallypi/"
- else 
-     echo "enter install location"
-     read response
-     export INSTDIR=$response
- fi
- }
+echo "install in /home/pi/tallypi? (y/n)"
+read response
+if [ $response = "y" ]
+then
+    export INSTDIR="/home/pi/tallypi/"
+else 
+    echo "enter install location"
+    read response
+    export INSTDIR=$response
+fi
+}
  
- install_talllypi()
- {
- if [ ${INSTDIR:-X} = "X" ]
- then
-     echo "Somehow install location is not set"
-     set_tallypi_location
- fi
- mkdir -p $INSTDIR
+install_java()
+{
+if [ ${INSTDIR:-X} = "X" ]
+then
+    echo "Somehow install location is not set"
+    set_tallypi_location
+fi
+mkdir -p $INSTDIR
  
- if type -p java; then
+if type -p java; then
     echo found java executable in PATH
     _java=java
 elif [[ -n "$JAVA_HOME" ]] && [[ -x "$JAVA_HOME/bin/java" ]];  then
     echo found java executable in JAVA_HOME     
     _java="$JAVA_HOME/bin/java"
 else
-    echo "no java"
-    exit 5
+    echo "no java, installing"
+    sudo apt install defalt-jdk
 fi
+}
+
+test_wiringpi()
+{
+piver=`gpio -v | grep version | awk '{print $3}'`
+if [ ${piver:-X} = "X"
+then
+    echo "wiringpi version is not installed, please install wiring pi with sudo apt-get install wiringpi"
+    exit 9
+fi
+}
+
+install_pi4j()
+{
+
+curl -sSL https://pi4j.com/install | sudo bash
+}
 
 jvers=(java -version 2>&1 | head -1 | cut -d'"' -f2 | sed '/^1\./s///' | cut -d'.' -f1)
 
@@ -74,6 +91,9 @@ case in $jvers
        exit 9
        ;;
 esac      
+
+install_talllypi()
+{
        
 cd $INSTDIR
 echo "installing tally pi application"
@@ -96,6 +116,30 @@ fi
 sed -e tallylights.sh "s/{server_ip}/$obswebip/"
 sed -e tallylights.sh "s/{server_password}/$obswebpwd/"
 sed -e tallylights.sh "s/{INSTDIR}/$INSTDIR/"
+
+}
+
+config_xml()
+{
+mkdir -p $INSTDIR/xml
+editexit="y"
+
+while [ $editexit = "y" ]
+do
+    echo "enter the source name from OBS"
+    read obssource
+
+    echo "enter the GPIO pin to relate to this source
+    raspgpio
+
+    echo "to ente another relationship enter 'y'"
+    read editexit
+done 
+
+echo "Please review your xml file and exit if everything is okay"
+echo " if you make changes please exit with save to write changes"
+sleep 10
+mousepad xml/cameradefs.xml
 
 }
 
@@ -125,8 +169,16 @@ echo "Please make sure you have a JAVA JRE installed to run talllypi"
 
 
 set_tallypi_location
+
+install_java
      
+test_wiringpi
+
+install_pi4j
+
 install_talllypi 
+
+config_xml
  
 setup_tally_service
 	 
