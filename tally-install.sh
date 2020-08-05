@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 
 osrelease=`grep PRETTY_NAME /etc/os-release|awk -F= '{print $2}'| awk '{print $1}'`
 osversion=`grep VERSION /etc/os-release|awk -F= '{print $2}'|tail -2 | head -n1`
@@ -79,7 +78,7 @@ case $jvers in
        curl --output /tmp/tallypi.tar https://github.com/mball2301/obspitally/java8/obstally8.tar
        ;;
     11)
-       curl --output /tmp/tallypi.tar https://github.com/mball2301/obspitally/java8/obstally11.tar
+       curl --output /tmp/tallypi.tar https://github.com/mball2301/obspitally/java11/obstally11.tar
        ;;
     *)
        echo "unsupported version of JAVA.  Needs to be JAVA 8 or 11."
@@ -116,22 +115,32 @@ config_xml()
 mkdir -p $INSTDIR/xml
 editexit="y"
 
+echo '<?xml version="1.0" encoding="UTF-8"?>'>> $INSTDIR/xml/Camera_defs.xml
+echo "<cameras>" >> $INSTDIR/xml/Camera_defs.xml
+
+
 while [ $editexit = "y" ]
 do
+    echo "     <camera>">> $INSTDIR/xml/Camera_defs.xml
     echo "enter the source name from OBS"
     read obssource
+    echo " 	     <cameraName>$obssource</cameraName>">> $INSTDIR/xml/Camera_defs.xml
 
     echo "enter the GPIO pin to relate to this source"
-    raspgpio
+    read raspgpio
 
     echo "to ente another relationship enter 'y'"
     read editexit
+    echo "	     <cameraAddr>5</cameraAddr>">> $INSTDIR/xml/Camera_defs.xml 
+
+    echo "     </camera>">> $INSTDIR/xml/Camera_defs.xml
 done 
+echo "</cameras>">> $INSTDIR/xml/Camera_defs.xml
 
 echo "Please review your xml file and exit if everything is okay"
 echo " if you make changes please exit with save to write changes"
 sleep 10
-mousepad xml/cameradefs.xml
+mousepad $INSTDIR/xml/Camera_defs.xml
 
 }
 
@@ -140,18 +149,18 @@ setup_tally_service()
 cd $INSTDIR
 
 echo "setting up starup services"
-sed tallylights "s/{INSTDIR}/$INSTDIR}/" > /etc/init.d/tallylights
+sudo sed tallylights "s/{INSTDIR}/$INSTDIR}/" > /etc/init.d/tallylights
 
-mv tallylights.service /usr/lib/systemd/shared/
+sudo mv tallylights.service /usr/lib/systemd/shared/
 
-systemctl enable tallylights
-systemctl reload
+sudo systemctl enable tallylights
+sudo systemctl reload
 }
 
 cleanup()
 {
-rm -f $INSTDIR/tallylights
 rm -f /tmp/tallypi.tar
+# rm -f ~/obspitally
 
 }
 
