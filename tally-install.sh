@@ -112,7 +112,7 @@ fi
 set -x
 sed -i "s/server_ip/"$obswebip"/" tallylights.sh
 sed -i "s/server_password/"$obswebpwd"/" tallylights.sh
-sed -i "s/INSTDIR/"$INSTDIR"/" tallylights.sh
+sed -i "s@INSTDIR/"@\$INSTDIR"@" tallylights.sh
 
 }
 
@@ -155,7 +155,7 @@ setup_tally_service()
 cd $INSTDIR
 
 echo "setting up starup services"
-sudo sed "s/{INSTDIR}/$INSTDIR}/" tallylights > /etc/init.d/tallylights 
+sudo sed "s@INSTDIR@\$INSTDIR@" tallylights > /etc/init.d/tallylights 
 
 sudo mv tallylights.service /usr/lib/systemd/shared/
 
