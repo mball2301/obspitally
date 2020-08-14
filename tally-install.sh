@@ -87,13 +87,9 @@ case $jvers in
        ;;
 esac      
 
-cp -p install/tallylights $INSTDIR/tallylights
-cp -p install/tallylights.sh $INSTDIR/tallylights.sh
-cp -p install/tallylights.service $INSTDIR/tallylights.service
-
 cd $INSTDIR
 echo "installing tally pi application"
-tar -xv /tmp/tallypi.tar   
+tar -xvf /tmp/tallypi.tar   
 
 echo "installing tally pi shell script"
 echo "enter your obs websocket server ip address:"
@@ -109,10 +105,10 @@ if [ ${obswebpwd:-X} = "X" ]
 then
     obswebpwd="NULL"
 fi 
-set -x
+#set -x
 sed -i "s/server_ip/"$obswebip"/" tallylights.sh
 sed -i "s/server_password/"$obswebpwd"/" tallylights.sh
-sed -i "s@INSTDIR/"@\$INSTDIR"@" tallylights.sh
+sed -i "s@INSTDIR@$INSTDIR@" tallylights.sh
 
 }
 
@@ -155,12 +151,13 @@ setup_tally_service()
 cd $INSTDIR
 
 echo "setting up starup services"
-sudo sed "s@INSTDIR@\$INSTDIR@" tallylights > /etc/init.d/tallylights 
+sed "s@INSTDIR@$INSTDIR@" ${INSTDIR}tallylights > /tmp/tallylights
+sudo mv /tmp/tallylights /etc/init.d/tallylights
 
-sudo mv tallylights.service /usr/lib/systemd/shared/
+sudo mv ${INSTDIR}tallylights.service /lib/systemd/system/
 
 sudo systemctl enable tallylights
-sudo systemctl reload
+sudo systemctl daemon-reload
 }
 
 cleanup()
