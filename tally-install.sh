@@ -76,10 +76,10 @@ echo $jvers
 
 case $jvers in
     8)
-       curl --output /tmp/tallypi.tar https://github.com/mball2301/obspitally/java8/obstally8.tar
+       curl --output /tmp/tallypi.tar https://github.com/mball2301/obspitally/raw/master/java8/obstally8.tar
        ;;
     11)
-       curl --output /tmp/tallypi.tar https://github.com/mball2301/obspitally/java11/obstally11.tar
+       curl --output /tmp/tallypi.tar https://github.com/mball2301/obspitally/raw/master/java11/obstally11.tar
        ;;
     *)
        echo "unsupported version of JAVA.  Needs to be JAVA 8 or 11."
